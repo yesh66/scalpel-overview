@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scalpel AI — Physical AI for Surgical Logistics</title>
+<template id="__bundler_thumbnail" data-bg-color="#07090B">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#07090B"/>
+    <g stroke="#3EE0D0" stroke-width="3" fill="none">
+      <rect x="380" y="260" width="440" height="280" rx="8"/>
+      <line x1="380" y1="400" x2="820" y2="400"/>
+    </g>
+    <text x="600" y="630" text-anchor="middle" fill="#F4F6F8" font-family="serif" font-size="56" font-style="italic">Scalpel AI</text>
+    <text x="600" y="680" text-anchor="middle" fill="#6E7A84" font-family="monospace" font-size="16" letter-spacing="4">PHYSICAL AI · SURGICAL LOGISTICS</text>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07090B;
+    --bg-2:#0C1014;
+    --bg-3:#12171C;
+    --ink:#F4F6F8;
+    --ink-2:#B7C0C8;
+    --ink-3:#6E7A84;
+    --rule:#1B2228;
+    --rule-2:#262F37;
+    --cyan:#3EE0D0;     /* alignment-line teal */
+    --cyan-2:#7DF0E4;
+    --amber:#E8A34B;    /* signal secondary */
+    --red:#FF5D5D;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Geist',ui-sans-serif,system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{font-size:16px;line-height:1.55}
+  .mono{font-family:'Geist Mono',ui-monospace,monospace;letter-spacing:.02em}
+  .serif{font-family:'Instrument Serif',serif;font-weight:400;letter-spacing:-.01em}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 48px}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:22px 48px;border-bottom:1px solid var(--rule);position:sticky;top:0;background:rgba(7,9,11,.85);backdrop-filter:blur(16px);z-index:20}
+  .brand{display:flex;align-items:center;gap:12px;font-family:'Geist Mono';letter-spacing:.18em;font-size:12px;text-transform:uppercase}
+  .brand .mark{width:22px;height:22px;display:grid;place-items:center;border:1px solid var(--ink);border-radius:3px}
+  .brand .mark svg{width:12px;height:12px}
+  .meta{display:flex;gap:28px;font-family:'Geist Mono';font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+  .meta b{color:var(--ink);font-weight:500}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--rule)}
+  .hero-grid{position:absolute;inset:0;background-image:
+    linear-gradient(to right, rgba(62,224,208,.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(62,224,208,.06) 1px, transparent 1px);
+    background-size:80px 80px;
+    mask-image:radial-gradient(ellipse 80% 80% at 50% 40%, black 40%, transparent 80%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative;padding:64px 0 24px}
+  .kicker{display:inline-flex;align-items:center;gap:10px;font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(62,224,208,.35);background:rgba(62,224,208,.06);padding:8px 14px;border-radius:999px}
+  .kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  h1.title{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(56px,7.6vw,112px);line-height:.96;letter-spacing:-.025em;margin:24px 0 0;max-width:14ch;text-wrap:balance}
+  h1.title em{font-style:italic;color:var(--cyan)}
+  .lede{max-width:62ch;margin-top:28px;font-size:20px;line-height:1.5;color:var(--ink-2)}
+  .lede b{color:var(--ink);font-weight:500}
+
+  .hero-stage{position:relative;margin-top:48px;display:grid;grid-template-columns:1.15fr .85fr;gap:0;align-items:end;border-top:1px solid var(--rule);padding-top:48px}
+  .hero-stage .left{position:relative}
+  .hero-stage .right{position:relative;border-left:1px solid var(--rule);padding-left:36px}
+  .hero-product{position:relative;width:100%;aspect-ratio:21/10;background:radial-gradient(ellipse 70% 60% at 50% 55%, #0f1519 0%, #07090B 70%);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .hero-product .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero-product .annotated{animation:revealBand 4.8s ease-in-out infinite}
+  @keyframes revealBand{
+    0%   { clip-path: inset(calc(18% - 22px) 0 calc(100% - 18% - 22px) 0); }
+    50%  { clip-path: inset(calc(78% - 22px) 0 calc(100% - 78% - 22px) 0); }
+    100% { clip-path: inset(calc(18% - 22px) 0 calc(100% - 18% - 22px) 0); }
+  }
+  .hero-product .scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.95;filter:drop-shadow(0 0 10px var(--cyan));animation:scan 4.8s ease-in-out infinite;z-index:3}
+  .hero-product .scan-glow{position:absolute;left:0;right:0;height:44px;background:linear-gradient(180deg, rgba(62,224,208,0) 0%, rgba(62,224,208,.12) 45%, rgba(62,224,208,.22) 50%, rgba(62,224,208,.12) 55%, rgba(62,224,208,0) 100%);animation:scanGlow 4.8s ease-in-out infinite;pointer-events:none;z-index:2}
+  @keyframes scan{0%{top:18%}50%{top:78%}100%{top:18%}}
+  @keyframes scanGlow{0%{top:calc(18% - 22px)}50%{top:calc(78% - 22px)}100%{top:calc(18% - 22px)}}
+  .hero-product .corners span{position:absolute;width:16px;height:16px;border:1px solid var(--cyan)}
+  .hero-product .corners .tl{top:14px;left:14px;border-right:none;border-bottom:none}
+  .hero-product .corners .tr{top:14px;right:14px;border-left:none;border-bottom:none}
+  .hero-product .corners .bl{bottom:14px;left:14px;border-right:none;border-top:none}
+  .hero-product .corners .br{bottom:14px;right:14px;border-left:none;border-top:none}
+  .hero-product .label{position:absolute;top:16px;right:42px;font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase}
+  .hero-product .badge{position:absolute;bottom:16px;left:18px;font-family:'Geist Mono';font-size:10px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;display:flex;gap:14px}
+  .hero-product .badge span b{color:var(--ink)}
+
+  .hero-facts{display:flex;flex-direction:column;gap:22px}
+  .fact{padding-bottom:22px;border-bottom:1px dashed var(--rule-2)}
+  .fact:last-child{border-bottom:none}
+  .fact .k{font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+  .fact .k::before{content:"";width:6px;height:6px;background:var(--cyan);display:inline-block}
+  .fact .v{margin-top:10px;font-size:17px;color:var(--ink);line-height:1.4;max-width:34ch}
+  .fact .v b{color:var(--cyan);font-weight:500}
+
+  /* ---------- metric band ---------- */
+  .metric-band{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#0A0D10}
+  .metrics{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));}
+  .metric{padding:44px 36px;border-right:1px solid var(--rule);position:relative}
+  .metric:last-child{border-right:none}
+  .metric .tag{font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+  .metric .big{font-family:'Instrument Serif',serif;font-size:72px;line-height:1;letter-spacing:-.02em;margin-top:12px;color:var(--ink);display:flex;align-items:baseline;gap:6px}
+  .metric .big sup{font-size:22px;color:var(--cyan);font-family:'Geist Mono';font-weight:500;letter-spacing:0;vertical-align:super;position:relative;top:-18px}
+  .metric .big .unit{font-family:'Geist Mono';font-size:22px;color:var(--ink-2);font-weight:500;letter-spacing:0}
+  .metric .cap{margin-top:14px;color:var(--ink-2);font-size:14px;max-width:28ch;line-height:1.45}
+
+  /* ---------- section chrome ---------- */
+  section{padding:88px 0;border-bottom:1px solid var(--rule)}
+  .section-head{display:grid;grid-template-columns:220px 1fr;gap:48px;margin-bottom:48px}
+  .section-head .idx{font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+  .section-head h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(40px,4.6vw,60px);line-height:1.02;letter-spacing:-.02em;margin:0;max-width:22ch;text-wrap:balance}
+  .section-head h2 em{color:var(--cyan);font-style:italic}
+
+  /* ---------- why now ---------- */
+  .why-grid{display:grid;grid-template-columns:220px 1fr 1fr;gap:48px}
+  .why-grid p{font-size:17px;color:var(--ink-2);line-height:1.6;margin:0}
+  .why-grid p b{color:var(--ink);font-weight:500}
+  .why-grid .col:first-of-type p{font-size:20px;color:var(--ink)}
+  .why-grid .col > div + p{margin-top:20px}
+
+  /* ---------- deployments ---------- */
+  .deploy{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .card{background:linear-gradient(180deg, #0C1014 0%, #0A0D10 100%);border:1px solid var(--rule);border-radius:4px;padding:36px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, var(--cyan), transparent);opacity:.5}
+  .card .partner{font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+  .card .partner .live{display:flex;align-items:center;gap:8px;color:var(--cyan)}
+  .card .partner .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  .card h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:34px;line-height:1.1;letter-spacing:-.015em;margin:0 0 10px;color:var(--ink)}
+  .card p.role{color:var(--ink-2);font-size:15px;margin:0 0 28px}
+  .card .stats{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding-top:22px;border-top:1px solid var(--rule)}
+  .card .stats .s .k{font-family:'Geist Mono';font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
+  .card .stats .s .v{font-family:'Instrument Serif',serif;font-size:34px;line-height:1;margin-top:6px;color:var(--ink)}
+  .card .stats .s .v .unit{font-family:'Geist Mono';font-size:14px;color:var(--ink-2);margin-left:2px}
+
+  /* ---------- platform / how it works ---------- */
+  .platform{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+  .platform-visual{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse 70% 60% at 50% 55%, #0f1519 0%, #07090B 70%);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .slides{position:absolute;inset:0}
+  .slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none;display:flex;align-items:center;justify-content:center}
+  .slide.active{opacity:1;pointer-events:auto}
+  .slide img{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}
+  .slide .slide-title{position:absolute;top:18px;left:20px;font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);z-index:2}
+  .slide .slide-sub{position:absolute;bottom:56px;right:20px;max-width:58%;font-family:'Geist Mono';font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);text-align:right;line-height:1.6;z-index:2}
+  .platform-visual .controls{position:absolute;left:0;right:0;bottom:0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(180deg, transparent, rgba(7,9,11,.85) 40%);z-index:3}
+  .platform-visual .dots{display:flex;gap:8px;align-items:center}
+  .platform-visual .dot{appearance:none;background:none;border:none;padding:0;cursor:pointer;width:auto;height:auto;display:flex;align-items:center;gap:8px;font-family:'Geist Mono';font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);transition:color .2s}
+  .platform-visual .dot .bar{width:20px;height:2px;background:var(--rule-2);transition:background .2s, width .3s}
+  .platform-visual .dot[aria-current="true"]{color:var(--cyan)}
+  .platform-visual .dot[aria-current="true"] .bar{background:var(--cyan);width:36px}
+  .platform-visual .nav{display:flex;gap:6px}
+  .platform-visual .navbtn{appearance:none;background:rgba(12,16,20,.8);border:1px solid var(--rule);color:var(--ink-2);width:32px;height:32px;border-radius:2px;cursor:pointer;display:grid;place-items:center;font-family:'Geist Mono';font-size:12px;transition:all .2s}
+  .platform-visual .navbtn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+  .stack{display:flex;flex-direction:column}
+  .layer{padding:26px 0;border-top:1px solid var(--rule);display:grid;grid-template-columns:48px 1fr;gap:24px;align-items:start}
+  .layer:first-child{border-top:none;padding-top:0}
+  .layer .n{font-family:'Geist Mono';font-size:11px;letter-spacing:.2em;color:var(--ink-3);padding-top:6px}
+  .layer h4{font-family:'Geist',sans-serif;font-size:22px;font-weight:500;margin:0 0 8px;color:var(--ink);letter-spacing:-.01em}
+  .layer p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.55;max-width:50ch}
+  .layer h4 .arrow{color:var(--cyan);margin-right:6px}
+
+  /* ---------- data flywheel strip ---------- */
+  .flywheel{background:#0A0D10;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:64px 0}
+  .flywheel-inner{display:grid;grid-template-columns:280px 1fr;gap:48px;align-items:start}
+  .flywheel .idx{font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+  .flywheel h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:42px;line-height:1.05;letter-spacing:-.02em;margin:10px 0 0;text-wrap:balance}
+  .flywheel h3 em{color:var(--cyan);font-style:italic}
+  .chain{display:grid;grid-template-columns:repeat(4, 1fr);gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+  .chain .node{padding:26px 22px;border-right:1px solid var(--rule);background:#0C1014;position:relative}
+  .chain .node:last-child{border-right:none}
+  .chain .node .idx{font-family:'Geist Mono';font-size:10px;color:var(--cyan);letter-spacing:.22em}
+  .chain .node h5{font-family:'Geist',sans-serif;font-weight:500;font-size:16px;margin:10px 0 6px;color:var(--ink);letter-spacing:-.005em}
+  .chain .node p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .chain .node::after{content:"→";position:absolute;right:-9px;top:50%;transform:translateY(-50%);background:#0A0D10;width:18px;height:18px;display:grid;place-items:center;color:var(--cyan);font-family:'Geist Mono';font-size:14px;z-index:2}
+  .chain .node:last-child::after{display:none}
+
+  /* ---------- TAM ---------- */
+  .tam{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  .tam-text h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:44px;line-height:1.05;margin:12px 0 18px;letter-spacing:-.02em;text-wrap:balance}
+  .tam-text h3 em{color:var(--cyan);font-style:italic}
+  .tam-text p{color:var(--ink-2);font-size:17px;line-height:1.6;max-width:52ch}
+  .tam-visual{position:relative;aspect-ratio:1/1;display:grid;place-items:center}
+  .tam-visual svg{width:100%;height:100%}
+
+  /* ---------- team / raise ---------- */
+  .raise{display:grid;grid-template-columns:1.2fr .8fr;gap:48px}
+  .raise .who p{font-size:17px;color:var(--ink-2);line-height:1.6;max-width:58ch}
+  .raise .who p b{color:var(--ink);font-weight:500}
+  .raise .who .backers{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}
+  .raise .who .backers span{font-family:'Geist Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--rule-2);padding:8px 12px;border-radius:2px}
+  .raise .use{border:1px solid var(--rule);border-radius:4px;padding:28px;background:linear-gradient(180deg, #0C1014, #09. 0C10)}
+  .raise .use h4{font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin:0 0 20px}
+  .raise .use ul{list-style:none;padding:0;margin:0}
+  .raise .use li{padding:16px 0;border-top:1px dashed var(--rule-2);color:var(--ink);font-size:16px;display:flex;align-items:baseline;gap:14px}
+  .raise .use li:first-child{border-top:none;padding-top:0}
+  .raise .use li .n{font-family:'Geist Mono';font-size:11px;color:var(--cyan);letter-spacing:.18em;min-width:32px}
+
+  /* ---------- CTA ---------- */
+  .cta{padding:96px 0 80px;position:relative;overflow:hidden}
+  .cta::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%, rgba(62,224,208,.08), transparent 60%);pointer-events:none}
+  .cta-inner{position:relative;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+  .cta h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(40px,5vw,72px);line-height:1.02;letter-spacing:-.025em;margin:0 0 28px;max-width:22ch}
+  .cta h2 em{color:var(--cyan);font-style:italic}
+  .cta p{font-size:20px;color:var(--ink-2);max-width:56ch;line-height:1.5;margin:0}
+  .cta p b{color:var(--ink);font-weight:500}
+  .cta .contact{text-align:right;display:flex;flex-direction:column;gap:16px;min-width:280px}
+  .cta .contact .k{font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+  .cta .contact .name{font-family:'Instrument Serif',serif;font-size:32px;line-height:1.1;letter-spacing:-.01em;color:var(--ink);margin-top:4px}
+  .cta .contact .name em{color:var(--cyan);font-style:italic}
+  .cta .contact .sf-note{margin-top:14px;font-size:14px;color:var(--ink-2);line-height:1.5;max-width:26ch;margin-left:auto}
+  .cta .contact .sf-note b{color:var(--ink);font-weight:500}
+  .cta .contact a{font-family:'Geist Mono';font-size:13px;color:var(--cyan);text-decoration:none;letter-spacing:.04em;border-bottom:1px solid rgba(62,224,208,.3);padding-bottom:2px;align-self:flex-end}
+  .cta .contact a:hover{border-bottom-color:var(--cyan)}
+  .cta .where{margin-top:8px;font-family:'Geist Mono';font-size:11px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;display:flex;align-items:center;gap:10px;justify-content:flex-end}
+  .cta .where .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 2s ease-in-out infinite}
+
+  /* ---------- footer ---------- */
+  footer{padding:28px 0;border-top:1px solid var(--rule);color:var(--ink-3);font-family:'Geist Mono';font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center}
+
+  /* responsiveness (keep desktop feel; mobile gracefully degrades) */
+  @media (max-width: 960px){
+    .wrap, .topbar{padding-left:24px;padding-right:24px}
+    .hero-stage{grid-template-columns:1fr;padding-top:36px;margin-top:36px}
+    .hero-stage .right{border-left:none;padding-left:0;border-top:1px solid var(--rule);padding-top:28px;margin-top:36px}
+    .metrics{grid-template-columns:1fr 1fr}
+    .metric{border-right:none;border-bottom:1px solid var(--rule)}
+    .metric:nth-child(even){border-right:none}
+    .section-head, .why-grid, .platform, .tam, .raise, .cta-inner, .flywheel-inner{grid-template-columns:1fr;gap:28px}
+    .deploy{grid-template-columns:1fr}
+    .chain{grid-template-columns:1fr 1fr}
+    .chain .node{border-right:none;border-bottom:1px solid var(--rule)}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <span>Scalpel&nbsp;AI</span>
+  </div>
+  <div class="meta">
+    <span><b>Overview</b></span>
+    <span>Apr&nbsp;2026</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" style="padding:0;border-bottom:1px solid var(--rule)">
+  <div class="hero-grid"></div>
+  <div class="wrap hero-inner">
+    <span class="kicker"><span class="dot"></span>Physical AI · Surgical Logistics</span>
+    <h1 class="title">Making the world's surgical instruments <em>machine-readable.</em></h1>
+    <p class="lede">
+      Scalpel is building the <b>intelligence layer for Physical AI in Surgical Logistics</b> — the digital backbone between the supply chain and the sterile field. Every validated tray compounds into structured data on instrument condition, usage, and workflow bottlenecks across the <b>$210B US surgical economy</b>.
+    </p>
+
+    <div class="hero-stage">
+      <div class="left">
+        <div class="hero-product">
+          <img class="layer raw" src="assets/tray-raw.png" alt="Surgical tray"/>
+          <img class="layer annotated" src="assets/tray-inference.png" alt="Scalpel Active Vision — tray inference"/>
+          <div class="scan-glow"></div>
+          <div class="scan"></div>
+          <div class="corners"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+          <div class="badge">
+            <span>Inference · <b>46 / 46 correct</b></span>
+            <span>Status · <b style="color:var(--cyan)">VERIFIED</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="hero-facts">
+          <div class="fact">
+            <div class="k">Live deployments</div>
+            <div class="v">Stryker's largest ortho distributor in the US. Joint Medical Concepts (Zimmer Biomet). <b>Hospital SPDs.</b></div>
+          </div>
+          <div class="fact">
+            <div class="k">Validated in production</div>
+            <div class="v"><b>700,000+ instruments</b> passed through Scalpel Active Vision — every tray compounding into proprietary dataset.</div>
+          </div>
+          <div class="fact">
+            <div class="k">Raising</div>
+            <div class="v"><b>Series A underway.</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRIC BAND -->
+<div class="metric-band">
+  <div class="metrics">
+    <div class="metric">
+      <div class="tag">Instruments validated</div>
+      <div class="big">700<span class="unit">K+</span></div>
+      <div class="cap">In live clinical and distributor deployments. Doubling every quarter.</div>
+    </div>
+    <div class="metric">
+      <div class="tag">Fewer tray errors</div>
+      <div class="big">95<sup>%</sup></div>
+      <div class="cap">Near-elimination of the #1 cause of OR delays and cancelled cases.</div>
+    </div>
+    <div class="metric">
+      <div class="tag">Throughput uplift</div>
+      <div class="big">66<sup>%</sup></div>
+      <div class="cap">Measured step-change in warehouse throughput, same headcount.</div>
+    </div>
+    <div class="metric">
+      <div class="tag">Addressable market</div>
+      <div class="big">$210<span class="unit">B</span></div>
+      <div class="cap">US surgical economy. Every case runs on trays that today are unindexed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY NOW -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="idx">01 · Why now</div>
+      <h2>Surgery is being rebuilt in real time — the <em>backend still runs on paper.</em></h2>
+    </div>
+    <div class="why-grid">
+      <div class="col">
+        <p>Volumes up <b>5–7% a year</b>. Robotic platforms taking over the table. Instrument complexity has <b>roughly tripled</b> in a decade.</p>
+      </div>
+      <div class="col">
+        <p>Meanwhile, the <b>surgical supply chain</b> — from warehouses and couriers to sterile services — the backend that readies every procedure, still runs on paper, human memory, and fragmented spreadsheets.</p>
+      </div>
+      <div class="col">
+        <p>The gap between what the OR needs and what the backend can deliver is now the <b>single biggest drag on hospital surgical capacity.</b> And it widens every quarter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM / HOW IT WORKS -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="idx">02 · The platform</div>
+      <h2>Right instruments. Right place. <em>Right time.</em><br/>Hundreds of surgical instruments per case. Validated in seconds.</h2>
+    </div>
+    <div class="platform">
+      <div class="platform-visual">
+        <div class="slides">
+          <div class="slide active" data-slide="0">
+            <img src="assets/scalpel-one-angle.png" alt="Scalpel Active Vision workstation"/>
+            <div class="slide-title">Scalpel <b style="color:var(--cyan)">Active&nbsp;Vision</b></div>
+            <div class="slide-sub">Warehouses &nbsp;·&nbsp; Sterile&nbsp;Services</div>
+          </div>
+          <div class="slide" data-slide="1">
+            <img src="assets/scalpel-go-phone.png" alt="Scalpel Go mobile"/>
+            <div class="slide-title">Scalpel <b style="color:var(--cyan)">Go</b></div>
+            <div class="slide-sub">Last-mile&nbsp;logistics &nbsp;·&nbsp; Sales&nbsp;Reps</div>
+          </div>
+          <div class="slide" data-slide="2">
+            <img src="assets/scalpel-intelligence.png" alt="Scalpel Intelligence dashboard"/>
+            <div class="slide-title">Scalpel <b style="color:var(--cyan)">Intelligence</b></div>
+            <div class="slide-sub">Real-time predictive analytics on supply chain workflows</div>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="dots" role="tablist">
+            <button class="dot" aria-current="true"  data-go="0"><span class="bar"></span><span>01</span></button>
+            <button class="dot" aria-current="false" data-go="1"><span class="bar"></span><span>02</span></button>
+            <button class="dot" aria-current="false" data-go="2"><span class="bar"></span><span>03</span></button>
+          </div>
+          <div class="nav">
+            <button class="navbtn" data-step="-1" aria-label="Previous">←</button>
+            <button class="navbtn" data-step="1" aria-label="Next">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="layer">
+          <div class="n">→ 01</div>
+          <div>
+            <h4>Computer vision validates every instrument</h4>
+            <p>Hundreds of instruments per case, near-perfect accuracy, in seconds. Replaces manual count-sheets with structured, auditable data — on condition, usage, and placement.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="n">→ 02</div>
+          <div>
+            <h4>Workflow orchestration across the tray lifecycle</h4>
+            <p>Sterile processing, ORs, distribution, and the emerging robotic-readiness cell — all running on the same live state. ScalpelGo extends machine vision and traceability to every handoff beyond the workstation.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="n">→ 03</div>
+          <div>
+            <h4>Real-time data layer for hospital leaders</h4>
+            <p>First honest, site-by-site view of OR readiness. What's validated, what's late, what's breaking down. Turns sterile processing from a cost center into a capacity lever.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="n">→ 04</div>
+          <div>
+            <h4>Substrate for the automation layer</h4>
+            <p>Every validated tray compounds into the dataset that unlocks predictive tray building, automated case scheduling, and — ultimately — robotic tray assembly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPLOYMENTS -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="idx">03 · In production</div>
+      <h2>Live at the <em>largest names</em> in orthopedics.</h2>
+    </div>
+    <div class="deploy">
+      <div class="card">
+        <div class="partner"><span>Partner · 01</span><span class="live">Live</span></div>
+        <h3>Stryker's largest orthopaedic distributor</h3>
+        <p class="role">Primary validation point for tray flow into Stryker's US orthopaedic network.</p>
+        <div class="stats">
+          <div class="s"><div class="k">Instruments / month</div><div class="v">58K<span class="unit">+</span></div></div>
+          <div class="s"><div class="k">Tray errors caught</div><div class="v">&gt;95<span class="unit">%</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="partner"><span>Partner · 02</span><span class="live">Live</span></div>
+        <h3>Zimmer Biomet's flagship orthopaedic distributor</h3>
+        <p class="role">At Joint Medical Concepts, Scalpel's vision AI layer for tray validation eliminates errors and inefficiencies.</p>
+        <div class="stats">
+          <div class="s"><div class="k">Throughput uplift</div><div class="v">66<span class="unit">%</span></div></div>
+          <div class="s"><div class="k">Manual double-checks</div><div class="v">Eliminated</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA FLYWHEEL -->
+<div class="flywheel">
+  <div class="wrap flywheel-inner">
+    <div>
+      <div class="idx">04 · The flywheel</div>
+      <h3>Every scan improves the model and <em>adds compounding value</em>.</h3>
+    </div>
+    <div class="chain">
+      <div class="node">
+        <div class="idx">01</div>
+        <h5>Validate</h5>
+        <p>Tray passes through Scalpel Active Vision. Every instrument indexed with condition + placement.</p>
+      </div>
+      <div class="node">
+        <div class="idx">02</div>
+        <h5>Structure</h5>
+        <p>Fragmented paper + memory → a queryable record of tray readiness and instrument readiness across the supply chain.</p>
+      </div>
+      <div class="node">
+        <div class="idx">03</div>
+        <h5>Predict</h5>
+        <p>Tray building, case scheduling, and failure modes — all learned from live data.</p>
+      </div>
+      <div class="node">
+        <div class="idx">04</div>
+        <h5>Automate</h5>
+        <p>The dataset becomes the substrate for robotic tray assembly and OR readiness.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAM -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="idx">05 · The big picture</div>
+      <h2>Tray-level accuracy is the wedge. <em>Connected Surgical Intelligence</em> is the game.</h2>
+    </div>
+    <div class="tam">
+      <div class="tam-text">
+        <p style="font-family:'Geist Mono';font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);margin:0">Addressable layer</p>
+        <h3>AI infrastructure for the <em>$210B</em> US surgical economy.</h3>
+        <p>Every surgical case today depends on a tray that is counted by hand, shipped on a paper slip, and trusted by a human memory. Scalpel turns that tray into <b>structured, machine-readable state</b> — the substrate every downstream system, from scheduling to robotics, will need.</p>
+      </div>
+      <div class="tam-visual">
+        <svg viewBox="0 0 400 400" fill="none">
+          <defs>
+            <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#3EE0D0" stop-opacity=".15"/>
+              <stop offset="100%" stop-color="#3EE0D0" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- concentric rings -->
+          <circle cx="200" cy="200" r="190" stroke="#1B2228" stroke-width="1"/>
+          <circle cx="200" cy="200" r="150" stroke="#1B2228" stroke-width="1" stroke-dasharray="2 4"/>
+          <circle cx="200" cy="200" r="110" stroke="#1B2228" stroke-width="1"/>
+          <circle cx="200" cy="200" r="70" stroke="#3EE0D0" stroke-width="1" stroke-opacity=".6"/>
+          <circle cx="200" cy="200" r="190" fill="url(#g1)"/>
+          <!-- labels -->
+          <g font-family="Geist Mono" font-size="10" fill="#6E7A84" letter-spacing="2">
+            <text x="200" y="24" text-anchor="middle">$210B · US SURGICAL ECONOMY</text>
+            <text x="200" y="64" text-anchor="middle" fill="#B7C0C8">$48B · INSTRUMENT LOGISTICS</text>
+            <text x="200" y="104" text-anchor="middle" fill="#F4F6F8">$12B · SPD + TRAY FLOW</text>
+          </g>
+          <!-- core -->
+          <circle cx="200" cy="200" r="70" fill="#0C1014" stroke="#3EE0D0" stroke-width="1"/>
+          <text x="200" y="196" text-anchor="middle" font-family="Instrument Serif" font-size="22" fill="#F4F6F8">Scalpel</text>
+          <text x="200" y="216" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#3EE0D0" letter-spacing="2">THE WEDGE</text>
+          <!-- crosshair -->
+          <line x1="200" y1="10" x2="200" y2="390" stroke="#262F37" stroke-dasharray="1 5"/>
+          <line x1="10" y1="200" x2="390" y2="200" stroke="#262F37" stroke-dasharray="1 5"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM / RAISE -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="idx">06 · Team &amp; raise</div>
+      <h2>Series A · <em>underway.</em></h2>
+    </div>
+    <div class="raise">
+      <div class="who">
+        <p><b>Founded by Dr. Yeshwanth Pulijala and Dr. Shahnawaz Ahmed.</b> Yesh has a PhD in Medical Visualization, and Shah has a PhD in Computer Vision. Together, they build a team that transforms surgical workflows.</p>
+        <p>Multi-million ARR contracted. Double-digit deployment sites across the UK with US expansion underway. Robotic-readiness product in development with early design partners.</p>
+        <div style="margin-top:20px;font-family:'Geist Mono';font-size:10px;letter-spacing:.22em;color:var(--ink-3);text-transform:uppercase">Backed by</div>
+        <div class="backers">
+          <span>Mercia Ventures</span>
+          <span>Tensor Ventures</span>
+          <span>Deep Science Ventures</span>
+          <span>Henley Business Angels</span>
+        </div>
+      </div>
+      <div class="use">
+        <h4>Use of funds</h4>
+        <ul>
+          <li><span class="n">01</span><span>US commercial expansion across distributors &amp; IDNs.</span></li>
+          <li><span class="n">02</span><span>Robotic-readiness layer — from validation to assembly.</span></li>
+          <li><span class="n">03</span><span>Scaling the data platform into a predictive OS for surgery.</span></li>
+          <li><span class="n">04</span><span>Commercial engine — Scalpel as the default at every site we touch.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" style="border-bottom:none">
+  <div class="wrap cta-inner">
+    <div>
+      <h2>Scalpel AI — the <em>intelligence layer</em> for physical AI in surgical logistics.</h2>
+    </div>
+    <div class="contact">
+      <div>
+        <div class="k">Founder &amp; CEO</div>
+        <div class="name">Yesh <em>Pulijala</em></div>
+        <div class="sf-note">In <b>San Francisco for the next two weeks</b> and taking meetings.</div>
+      </div>
+      <a href="mailto:yesh@scalpel.ai">yesh@scalpel.ai&nbsp;→</a>
+      <div class="where"><span class="dot"></span>In&nbsp;SF · Apr&nbsp;23 — May&nbsp;7</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Scalpel&nbsp;AI HQ · London &nbsp;•&nbsp; Scalpel&nbsp;Inc. · Atlanta</span>
+    <span>scalpel.ai</span>
+  </div>
+</footer>
+
+</body>
+<script>
+(function(){
+  var root = document.querySelector('.platform-visual');
+  if(!root) return;
+  var slides = root.querySelectorAll('.slide');
+  var dots = root.querySelectorAll('.dot');
+  var idx = 0, timer;
+  function go(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    dots.forEach(function(d,i){ d.setAttribute('aria-current', i===idx ? 'true':'false'); });
+  }
+  function restart(){ clearInterval(timer); timer = setInterval(function(){ go(idx+1); }, 5000); }
+  dots.forEach(function(d){ d.addEventListener('click', function(){ go(+d.dataset.go); restart(); }); });
+  root.querySelectorAll('.navbtn').forEach(function(b){ b.addEventListener('click', function(){ go(idx + (+b.dataset.step)); restart(); }); });
+  restart();
+})();
+</script>
+</html>
